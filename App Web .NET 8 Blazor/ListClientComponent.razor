@@ -1,0 +1,324 @@
+﻿@page "/Client/ListClient"
+@rendermode InteractiveServer
+@attribute [StreamRendering()]
+<PageTitle>Listado de Clientes</PageTitle>
+
+<div class="row">
+    <div class="col-sm-12">
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <div class="header-title">
+            <h4 class="card-title">Clientes</h4>
+        </div>
+    </div>
+    <div class="card-body">
+            <p></p>
+            @if (_clientsFilter == null)
+                {
+                    <tr>
+                        <td colspan="7">No se han Cargado Clientes</td>
+                    </tr>
+                }
+                else
+                {
+
+            <div class="table-responsive">
+                <table id="datatable_client" class="table table-striped" data-toggle="data-table-client">
+                <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Documento</th>
+                    <th>F. Nacimiento</th>
+                    <th>Telefono</th>
+                    <th>Estado</th>
+                    <th>Fecha de Pago</th>
+                    <th>Plan</th>
+                    <th>Localidad</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+             
+                    @foreach (var item in _clientsFilter)
+                    {
+                        <tr id='tr_@item.Id'>
+                            <td>@item.nameComplete</td>
+                            <td>@item.Document</td>
+                            <td>@item.Birthday </td>
+                            <td>@item.phone</td>
+                            <td>@item.statusName</td>
+                            <td>@item.paymentDate</td>
+                            <td>@item.plan</td>
+                            <td>@item.localityName</td>
+                            <td>
+                                <div style="float:right;">
+                                    <NavLink class="btn btn-sm btn-icon text-primary flex-end" href="@item.editarUrl">
+                                        <span class="btn-inner">
+                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M11.4925 2.78906H7.75349C4.67849 2.78906 2.75049 4.96606 2.75049 8.04806V16.3621C2.75049 19.4441 4.66949 21.6211 7.75349 21.6211H16.5775C19.6625 21.6211 21.5815 19.4441 21.5815 16.3621V12.3341" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.82812 10.921L16.3011 3.44799C17.2321 2.51799 18.7411 2.51799 19.6721 3.44799L20.8891 4.66499C21.8201 5.59599 21.8201 7.10599 20.8891 8.03599L13.3801 15.545C12.9731 15.952 12.4211 16.181 11.8451 16.181H8.09912L8.19312 12.401C8.20712 11.845 8.43412 11.315 8.82812 10.921Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <path d="M15.1655 4.60254L19.7315 9.16854" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </span>
+                                    </NavLink>
+                                    <NavLink class="btn btn-sm btn-icon text-danger " @onclick="() => DeletClient(item.Id)">
+                                        <span class="btn-inner">
+                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                                                <path d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <path d="M20.708 6.23975H3.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <path d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </span>
+                                    </NavLink>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+           
+
+                </tbody>
+                <tfoot>
+                <tr>
+                                    <th>Cliente</th>
+                                    <th>Documento</th>
+                                    <th>F. Nacimiento</th>
+                                    <th>Telefono</th>
+                                    <th>Estado</th>
+                                    <th>Fecha de Pago</th>
+                                    <th>Plan</th>
+                                    <th>Localidad</th>
+                                    <th></th>
+
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+
+    readonly IClientRepository _clientRepository = new ClientRepository();
+    readonly IReceiptRepository _receiptRepository = new ReceiptRepository();
+    readonly IPhoneRepository _phoneRepository = new PhoneRepository();
+
+    List<Client> client = new();
+
+    //clases para el filtro
+    List<Client> clientsFilter = new();
+    List<ClientItemList> _clientsFilter;
+    private string nameFilter { get; set; } = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("onafterrender async");
+        if (firstRender)
+        {
+            Console.WriteLine("First onafterrender async");
+            await jsr.InvokeVoidAsync("renderDataTable", "#datatable_client");
+        }
+
+       // await base.OnInitializedAsync();
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!NavigableService.Execute(NavigationManager, appState.Permit))
+        {
+            NavigationManager.NavigateTo("/Unauthorized");
+        }
+        else
+        {
+            try
+            {
+                SweetLoading();
+
+                var list = await _clientRepository.GetAllClient(appState.IdMortuary);
+                _clientsFilter = new List<ClientItemList>();
+                await updateClientsList(list);
+                client = list;
+                clientsFilter = list;
+            }
+            catch (Exception error)
+            {
+                SweetLoading("error", error.Message, true);
+            }
+            finally
+            {
+                Swal.CloseAsync();
+            }
+        }
+    }
+
+    public Task SweetLoading(string title = "Cargando datos...", string text = "Por favor, espere...", bool click = false)
+    {
+        return Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = title,
+            Text = text,
+            AllowOutsideClick = click
+        });
+    }
+
+    private async void DeletClient(int id)
+    {
+        try
+        {
+            var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = "¿Está seguro de Borrar el Cliente?, esta acción NO se puede deshacer.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "SI",
+                CancelButtonText = "Cancelar"
+            });
+            var confirm = !string.IsNullOrEmpty(result.Value);
+            if (confirm)
+            {
+                SweetLoading();
+
+                await jsr.InvokeVoidAsync("processingErased", id);
+                var response = await _clientRepository.DeleteClient(id);
+                if (!response.Flag)
+                {
+                    SweetLoading("Error", response.Message);
+                }
+                else
+                {
+                    SweetLoading("Exito", response.Message);
+                    await Task.Delay(1000);
+                    var list = await _clientRepository.GetAllClient(appState.IdMortuary);
+                    await updateClientsList(list);
+                    client = list;
+                    clientsFilter = list;
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception error)
+        {
+            SweetLoading("error", error.Message, true);
+        }
+        finally
+        {
+            Swal.CloseAsync();
+        }
+    }
+    private async Task updateClientsList(List<Client>list)
+    {
+        _clientsFilter.Clear();
+        foreach (var item in list)
+        {
+            var lastReceipt = await _receiptRepository.GetLastReceiptsByClient(item.Id);
+            var phoneTask = _phoneRepository.GetAllPhone(item.Id);
+            var paymentDate = lastReceipt.FirstOrDefault()?.CreatedAt.ToString("dd/MM/yyyy");
+            var plan = lastReceipt.FirstOrDefault()?.Membership.Plan.Name;
+            var number = item.NumberDomim?.ToString() ?? "";
+            var floor = item.Floor?.ToString() ?? "";
+            var addressList = new List<string>() { item.Street, number, item._Department, floor };
+            var phone = await phoneTask;
+            var itemList = new ClientItemList()
+            {
+                Id = item.Id,
+                Document = item.Document.ToString(),
+                Birthday = DateTime.Parse(item.Birthday.ToString()).ToString("dd/MM/yyyy"),
+                editarUrl = "/Client/AddClient/" + item.Id,
+                address = string.Join(" ", addressList),
+                nameComplete = item.Name + ", " + item.Lastname,
+                statusName = item.Status.Name,
+                localityName = item.Locality.Name,
+                plan = plan,
+                paymentDate = paymentDate,
+                phone = phone.FirstOrDefault()?.Phones,
+            };
+            _clientsFilter.Add(itemList);
+        }
+    }
+
+    //---------     SEARCH
+    public void OnTextChanged(ChangeEventArgs e)
+    {
+        /* breve explicacion de ChangeEventArgs:
+         *Es una clase que encapsula información sobre un cambio que ha ocurrido en un objeto.
+         Se utiliza en el patrón de observador para notificar a los suscriptores de un cambio en el estado de un objeto.
+         */
+
+        nameFilter = e?.Value?.ToString();
+
+        if (nameFilter?.Length == 0)
+        {
+            //Si nameFilter no contiene ningun caracter, lo que hacemos es volver la lista como estaba en un comienzo,
+            //ya que usamos una "copia" de la misma para restaurar los valores iniciales.
+            clientsFilter = client;
+        }
+        else
+        {
+            //filtramos los registros de los clientes por nombre / apellido o numero de documento
+            clientsFilter = clientsFilter.Where(c => c.Name.ToLower().Contains(nameFilter.ToLower()) || c.Lastname.ToLower().Contains(nameFilter.ToLower()) || nameFilter.Split(',').All(n => c.Document.ToString().Contains(n))).ToList();
+        }
+
+        StateHasChanged();
+    }
+
+
+    //----------  EXPORT EXCEL
+    /*ExcelExport export = new ExcelExport();
+    private async Task ExportaExcel()
+    {
+    try
+    {
+    export.ExcelGenerate(_jsService); // Removed _jsService argument
+
+   Console.WriteLine("LLega aqui? ");
+}
+catch (Exception error)
+   {
+   Console.WriteLine(error);
+}
+}*/
+
+    //--------------------- IMPORT EXCEL
+
+    private IBrowserFile file;
+    private List<List<string>> data;
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+
+        Console.WriteLine(file);
+//        data = await ReadExcelData(file);
+        //      Console.WriteLine(data);
+    }
+
+    private async Task<List<List<string>>> ReadExcelData(IBrowserFile file)
+    {
+        // Leer el archivo como un array de bytes
+        //var bytes =  file.OpenReadStream().ReadByte() ;
+        var bytes = file.OpenReadStream(); // OpenReadStream().ReadByte() ;
+
+        // Usar la biblioteca System.IO.File para leer el archivo
+        /*using (var stream = new MemoryStream(bytes))
+        {
+            using (var workbook = new XLWorkbook(stream))
+            {
+                var worksheet = workbook.Worksheets.FirstOrDefault();
+
+                // Obtener los datos de la hoja de cálculo
+                var data = worksheet.Rows().Select(row => row.Cells().Select(cell => cell.Value.ToString()).ToList()).ToList();
+
+                return data;
+            }
+        }*/
+        return data;
+    }
+
+
+}

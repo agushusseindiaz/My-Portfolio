@@ -1,0 +1,129 @@
+﻿@page "/"
+@using Funeraria.Components.Layout
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Color = MudBlazor.Color
+@layout LoginLayout
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<PageTitle>Login Funedev</PageTitle>
+<MudOverlay @bind-Visible="isVisible" DarkBackground="true" AutoClose="true"/>
+<div class="justify-content-center align-items-center" style="height: 100vh; display: @display">
+    <MudProgressCircular Color="Color.Info" Indeterminate="true"/>
+</div>
+<div class="wrapper d-flex flex-column h-100">
+    <section class="login-content d-flex flex-grow-1 justify-content-center align-items-center">
+        <div class="row w-100 m-0">
+            <div class="col-md-6 p-md-5 p-3">
+                <div class="card card-transparent shadow-none d-flex justify-content-center mb-0 auth-card">
+                    <div class="card-body ">
+                        <div class="d-flex justify-content-center align-items-center mb-6">
+                            <img src="../../assets/images/Logo_FuneDev.png" alt="Descripción de la imagen" style="max-height: 180px;">
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center mb-6">
+                            <div>
+                                <h2 class="mb-2 text-center">Iniciar Sesion</h2>
+                                <p class="text-center">Ingresa para conectarte al sistema.</p>
+                            </div>
+                        </div>
+                        <EditForm Model="@user" OnSubmit="@HandleSubmit">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="username" class="form-label">Usuario</label>
+                                        <InputText type="text" class="form-control" aria-describedby="user" id="username" @bind-Value="user.Username" required/>
+                                        <ValidationMessage For="@(() => user.Username)"/>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="password" class="form-label">Contraseña</label>
+                                        <InputText type="password" class="form-control" aria-describedby="password" id="password" @bind-Value="user.Password" required/>
+                                        <ValidationMessage For="@(() => user.Password)"/>
+                                    </div>
+                                </div>
+                                <!--  <div class="col-lg-12 d-flex justify-content-between">
+                                    <a class="nav-link active" aria-current="page" >Contraseña Olvidada.</a>
+                                </div> -->
+                            </div>
+                            <div class="d-flex justify-content-center mt-7">
+                                <button type="submit" class="btn btn-primary">Iniciar Sesion</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 d-none d-md-block p-0 bg-primary text-white">
+                <img src="../../assets/images/auth/01.png" class="img-fluid h-100" alt="images">
+            </div>
+        </div>
+    </section>
+</div>
+
+
+@code{
+    private bool isVisible;
+    private string display = "none";
+
+    private readonly UserLogin user = new();
+    readonly IAuthService AuthService = new AuthServiceRepository();
+
+    public async Task SweetAlert(string title, string text, SweetAlertIcon icon, bool showButton, string confiButton)
+    {
+        //SweetAlertIcon must be "success", "error", "warning", "info", or "question."
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = title,
+            Text = text,
+            Icon = icon,
+            ShowCancelButton = showButton,
+            ConfirmButtonText = confiButton
+        });
+        var confirm = !string.IsNullOrEmpty(resultado.Value);
+        if (confirm)
+        {
+            display = "none";
+            isVisible = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<LoginResponse> HandleSubmit()
+    {
+        display = "flex";
+        isVisible = true;
+        StateHasChanged();
+        try
+        {
+            var loginResponse = await AuthService.LoginAsync(user);
+
+            if (loginResponse.Flag == false)
+            {
+                user.Password = "";
+                user.Username = "";
+                await SweetAlert("Error", loginResponse.Message, SweetAlertIcon.Error, false, "Ok");
+                return loginResponse;
+            }
+            else
+            {
+                await ProtectedSessionStore.SetAsync("user", loginResponse.User, new TimeSpan(0, 8, 0, 0));
+                await ProtectedSessionStore.SetAsync("Token", loginResponse.JWTToken, new TimeSpan(0, 8, 0, 0));
+                await ProtectedSessionStore.SetAsync("Mortuary", loginResponse.IdMortuary.ToString(), new TimeSpan(0, 8, 0, 0));
+                await ProtectedSessionStore.SetAsync("IdUser", loginResponse.IdUser.ToString(), new TimeSpan(0, 8, 0, 0));
+                await ProtectedSessionStore.SetAsync("IdEmployee", loginResponse.IdEmployee.ToString(), new TimeSpan(0, 8, 0, 0));
+              //  await ProtectedSessionStore.SetAsync("Permit", loginResponse.userPermissions, new TimeSpan(0, 8, 0, 0));
+                
+                //List<string> storedPermissions = await ProtectedSessionStore.GetAsync<List<string>>("Permit");
+                appState.StartSession(loginResponse.User, loginResponse.JWTToken, loginResponse.IdMortuary, loginResponse.IdUser, loginResponse.IdEmployee, loginResponse.UserPermissions);
+
+                NavManager.NavigateTo("/Home");
+
+                return loginResponse;
+            }
+        }
+        catch (Exception error)
+        {
+            return new LoginResponse(false, error.Message);
+        }
+    }
+
+}

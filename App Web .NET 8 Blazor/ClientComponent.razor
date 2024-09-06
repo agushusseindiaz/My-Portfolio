@@ -1,0 +1,498 @@
+﻿@page "/Client/AddClient"
+@page "/Client/AddClient/{IdClient:int}"
+@using System.Text.RegularExpressions
+@rendermode InteractiveServer
+
+<div class="conatiner-fluid content-inner mt-n5 py-0">
+    <div>
+        <div class="row">
+            <div class="col-sm-12 col-lg-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Registrar Cliente</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                        <EditForm Model="@client" OnSubmit="@SaveClient">
+                            <!--DATOS PERSONALES DEL CLIENTE-->
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="name">Nombre<span class="text-danger">*</span>:</label>
+                                        <InputText type="text" class="form-control" @bind-Value="client.Name" id="name" required/>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="client_lastname">Apellido<span class="text-danger">*</span>:</label>
+                                        <InputText type="text" class="form-control" id="lastname" @bind-Value="client.Lastname" required/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label class="form-label" for="Document">Documento<span class="text-danger">*</span>:</label>
+                                            <InputNumber class="form-control" id="Document" @bind-Value="client.Document" required min="0"/>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label class="form-label" for="Brithday">Fecha de Nacimiento:<span class="text-danger">*</span>:</label>
+                                            <InputDate class="form-control" id="Brithday" @bind-Value="client.Birthday" min="1910-01-01" max="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="form-label" for="email">Email<span class="text-danger">*</span>:</label>
+                                    <InputText type="email" class="form-control" id="email" @bind-Value="client.Email" required/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="client_gender">Genero<span class="text-danger">*</span>:</label>
+                                        <InputSelect class="form-select" id="client_gender" @bind-Value="client.IdGender" required aria-label="select example">
+                                            <option>Seleccionar Genero</option>
+                                            @if (genders.Count() > 0)
+                                            {
+                                                @foreach (var Gender in genders)
+                                                {
+                                                    <option value="@Gender.Id">@Gender.Name</option>
+                                                }
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="client_status">Estado<span class="text-danger">*</span>:</label>
+                                        <InputSelect class="form-select" id="client_status" @bind-Value="client.IdStatus" required aria-label="select example">
+                                            <option>Seleccionar Estado</option>
+                                            @foreach (var Status in statuses)
+                                            {
+                                                <option value="@Status.Id">@Status.Name</option>
+                                            }
+
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--DATOS DE CONTACTO DEL CLIENTE-->
+                            <label class="form-label" for="">
+                                <h4>Direccion</h4>
+                            </label>
+                            <div class="form-group">
+                                <label class="form-label" for="client_street">Calle<span class="text-danger">*</span>:</label>
+                                <InputText type="text" id="client_street" class="form-control" @bind-Value="client.Street" placeholder="" required/>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="NumberDomim">Numero<span class="text-danger">*</span>:</label>
+                                        <InputNumber id="NumberDomim" class="form-control" @bind-Value="client.NumberDomim" required/>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="Department">Departamento</label>
+                                        <InputText id="Department" class="form-control" @bind-Value="client._Department"/>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="Floor">Piso</label>
+                                        <InputNumber id="Floor" class="form-control" @bind-Value="client.Floor"/>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="PostalCode">Cod Postal<span class="text-danger">*</span>:</label>
+                                        <InputNumber id="PostalCode" class="form-control" @bind-Value="client.PostalCode" required min="0"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label" for="client_province">Provincia<span class="text-danger">*</span></label>
+                                    <InputSelect class="form-select" id="client_province" @bind-Value="client.IdProvince" onchange="@ChangeProvince(client.IdProvince)" required aria-label="select example">
+                                        <option>Seleccionar Provincia</option>
+                                        @foreach (var Province in provinces)
+                                        {
+                                            <option value="@Province.Id">@Province.Name</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label" for="IdDepartment">Departamento<span class="text-danger">*</span></label>
+                                    <InputSelect class="form-select" id="IdDepartment" @bind-Value="client.IdDepartment" onchange="@ChangeDepartment(client.IdDepartment)" required aria-label="select example">
+                                        <option>Seleccionar Departamento</option>
+                                        @if (Departments?.Count() > 0)
+                                        {
+                                            @foreach (var department in Departments)
+                                            {
+                                                <option value="@department.Id">@department.Name</option>
+                                            }
+                                        }
+
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label" for="IdLocality">Localidad<span class="text-danger">*</span></label>
+                                    <InputSelect class="form-select" id="IdLocality" @bind-Value="client.IdLocality" required aria-label="select example">
+                                        <option>Seleccionar Localidad</option>
+                                        @if (localities?.Count() > 0)
+                                        {
+                                            @foreach (var Locality in localities)
+                                            {
+                                                <option value="@Locality.Id">@Locality.Name</option>
+                                            }
+                                        }
+
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label" for="IdTypeClient">Tipo de Cliente<span class="text-danger">*</span></label>
+                                    <InputSelect class="form-select" id="IdTypeClient" @bind-Value="client.IdTypeClient" required aria-label="select example">
+                                        <option value="0" selected="selected" disabled>Seleccionar Tipo de Cliente</option>
+                                        @foreach (var item in typeCliet)
+                                        {
+                                            <option value="@item.Id">@item.Name</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <h4>Datos Fisicos del cliente:</h4>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="Height">Altura cm<span class="text-danger">*</span></label>
+                                        <InputNumber id="Height" class="form-control" @bind-Value="client.Height" required min="0"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="Weight">Peso kg<span class="text-danger">*</span></label>
+                                        <InputNumber id="Weight" class="form-control" @bind-Value="client.Weight" required min="0"/>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="form-label" for="client_phone2">Datos de Contacto</label>
+                                @foreach (var phone in PhoneList)
+                                {
+                                    <div class="row">
+                                        <div class="col-12 col-sm-3">
+                                            <label for="@($"Phone_{phone.Id}")" class="form-label">Telefono<span class="text-danger">*</span>:</label>
+                                            <InputText id="phone" @bind-Value="phone.Phones" class="form-control"/>
+                                        </div>
+                                        <div class="col-12 col-sm-3">
+                                            <label class="form-label" for="IdTypeContact">Tipo de contacto<span class="text-danger">*</span>:</label>
+                                            <InputSelect class="form-select" id="IdTypeContact" @bind-Value="phone.IdTypeContact" required aria-label="select example">
+                                                <option>Seleccionar Tipo de contacto</option>
+                                                @if (TypeContacts?.Count() > 0)
+                                                {
+                                                    @foreach (var type in TypeContacts)
+                                                    {
+                                                        <option value="@type.Id">@type.Name</option>
+                                                    }
+                                                }
+
+                                            </InputSelect>
+                                        </div>
+                                        <div class="col-12 col-sm-4">
+                                            <label for="@($"Note_{phone.Id}")" class="form-label">Nota</label>
+                                            <InputText type="text" class="form-control" id="note" @bind-Value="phone.Note" placeholder="Nota"/>
+                                        </div>
+                                        <div class="col-12 col-sm-2 d-flex align-items-center">
+                                            <button button @onclick="() => DuplicateRow(phone)" type="button" class="round-button">
+                                                +
+                                            </button>
+                                            <button button @onclick="() => RemoveRow(phone)" type="button" class="round-button round-button-danger">
+                                                -
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <button type="submit" class="btn btn-primary">Grabar</button>
+                            <button type="reset" class="btn btn-danger" @onclick="SeguirTarea">Cancelar</button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter] public int IdClient { get; set; }
+    public List<Phone> phone { get; set; }
+
+    readonly IClientRepository _clientRepository = new ClientRepository();
+    readonly IGenderRepository _genderRepository = new GenderRepository();
+    readonly IProvinceRepository _provinceRepository = new ProvinceRepository();
+    readonly ILocalityRepository _localityRepository = new LocalityRepository();
+    readonly IStatusRepository _statusRepository = new StatusRepository();
+    readonly ITypeClientRepository _typeClientRepository = new TypeClientRepository();
+    readonly IPhoneRepository _phoneRepository = new PhoneRepository();
+    readonly ITypeContactRepository _typeContactRepository = new TypeContactRepository();
+    readonly IDeparmentRepository _deparmentRepository = new DeparmentRepository();
+
+    Client client = new();
+
+    List<Gender> genders = new();
+    List<Province> provinces = new();
+    List<Locality> localities = new();
+    List<Status> statuses = new();
+    List<TypeClient> typeCliet = new();
+    List<Phone> PhoneList = new();
+    List<TypeContact> TypeContacts = new();
+    List<Department> Departments = new();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!NavigableService.Execute(NavigationManager, appState.Permit))
+        {
+            NavigationManager.NavigateTo("/Unauthorized");
+        }
+        else
+        {
+            genders = await _genderRepository.GetAllGender();
+            provinces = await _provinceRepository.GetAllProvinces();
+            statuses = await _statusRepository.GetAllStatus();
+            typeCliet = await _typeClientRepository.GetAllTypeClient();
+            TypeContacts = await _typeContactRepository.GetAllTypeContact();
+            if (IdClient > 0)
+            {
+                client = await _clientRepository.GetClientById(IdClient);
+                phone = await _phoneRepository.GetAllPhone(IdClient);
+
+                if (phone != null && phone.Count() > 0)
+                {
+                    PhoneList = phone;
+                }
+                else
+                {
+                    PhoneList.Add(new Phone());
+                }
+
+                ;
+            }
+            else
+            {
+                client.Birthday = DateTime.Now;
+                PhoneList.Add(new Phone());
+            }
+        }
+    }
+
+
+    //METODO PARA AGREGAR MAS TELEFONOS
+    private void DuplicateRow(Phone phone)
+    {
+        var newPhone = new Phone();
+        PhoneList.Add(newPhone);
+        StateHasChanged();
+    }
+
+    //METODO PARA ELIMINAR OBJETOS DE TELEFONOS
+    private async void RemoveRow(Phone phoneToRemove)
+    {
+        try
+        {
+            var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmacion",
+                Text = "¿Esta seguro de Borrar el Telefono?, esta accion NO se puede deshacer.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "SI",
+                CancelButtonText = "Cancelar"
+            });
+            var confirm = !string.IsNullOrEmpty(result.Value);
+            if (confirm)
+            {
+                if (PhoneList.Count() > 1)
+                {
+                    if (phoneToRemove.Phones == null)
+                    {
+                        PhoneList.Remove(phoneToRemove);
+                        // Actualiza la vista para reflejar el cambio
+                        StateHasChanged();
+                    }
+                    else
+                    {
+                        var response = await _phoneRepository.DeletePhone(phoneToRemove.Id);
+                        if (response.Flag)
+                        {
+                            await SweetAlert("Exito", response.Message, SweetAlertIcon.Success, true, "Ok");
+
+                            PhoneList.Remove(phoneToRemove);
+                            // Actualiza la vista para reflejar el cambio
+                            StateHasChanged();
+                        }
+                        else
+                        {
+                            await SweetAlert("Error", response.Message, SweetAlertIcon.Success, true, "Ok");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception error)
+        {
+            await SweetAlert("Error", error.Message, SweetAlertIcon.Success, true, "Ok");
+        }
+    }
+
+    //CLASE PARA TRAER LAS LOCALIDADES SEGUN LA PROVINCIA
+    private bool isUpdating;
+
+    private async Task ChangeDepartment(int id)
+    {
+        if (id > 0)
+        {
+            if (isUpdating)
+            {
+                isUpdating = true;
+                localities = await _localityRepository.GetLocalitiesByIdPronvice(id);
+                StateHasChanged();
+                isUpdating = false;
+            }
+        }
+    }
+
+    private async Task ChangeProvince(int id)
+    {
+        if (id > 0)
+        {
+            if (!isUpdating)
+            {
+                isUpdating = true;
+                Departments = await _deparmentRepository.GetDepartmentsByIdPronvice(id);
+                StateHasChanged();
+                isUpdating = false;
+            }
+        }
+    }
+
+    public async Task SweetAlert(string title, string text, SweetAlertIcon icon, bool showButton, string confiButton)
+    {
+        //SweetAlertIcon must be "success", "error", "warning", "info", or "question."
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = title,
+            Text = text,
+            Icon = icon,
+            ShowCancelButton = showButton,
+            ConfirmButtonText = confiButton
+        });
+    }
+    private bool IsValidEmail(string email)
+    {
+        // Expresión regular para validar una dirección de correo electrónico
+        string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        Regex regex = new Regex(pattern);
+        return regex.IsMatch(email);
+    }
+    private async void SaveClient()
+    {
+        if (IsValidEmail(client.Email))
+        {
+            client.IdMortuary = appState.IdMortuary;
+            
+            try
+            {
+                if (IdClient > 0)
+                {
+                    // UPDATE CLIENT
+                    await _clientRepository.updateClientWithPhone(client, PhoneList);
+                }
+                else
+                {
+                    // CREATE CLIENT
+                    await _clientRepository.createClientWithPhone(client, PhoneList);
+                }
+
+                await SweetAlert("Exito", "¡Registro Creado!", SweetAlertIcon.Success, true, "Ok");
+                client = new Client();
+                PhoneList.Clear();
+                PhoneList.Add(new Phone());
+                StateHasChanged();
+            }
+            catch (Exception error)
+            {
+                await SweetAlert("Error", error.Message, SweetAlertIcon.Error, true, "Ok");
+                client = new Client();
+                PhoneList.Clear();
+                PhoneList.Add(new Phone());
+                StateHasChanged();
+            }
+
+
+/*          var result = IdClient > 0 ? await _clientRepository.UpdateClient(client) : await _clientRepository.CreateClient(client);
+  
+            if (!result.Flag)
+            {
+                await SweetAlert("Error", result.Message, SweetAlertIcon.Error, true, "Ok");
+            }
+            else
+            {
+                try
+                {
+                    foreach (var item in PhoneList)
+                    {
+                        //le asignamos el valor del id cliente para poder relacionarlo
+                        item.IdClient = result.Id; // result.Id es el id del cliente que retorno junto con el mensaje y el boleano
+                    }
+
+                    var phones = IdClient > 0 ? await _phoneRepository.UpdatePhone(PhoneList) : await _phoneRepository.CreatePhone(PhoneList);
+                }
+                catch (Exception error)
+                {
+                    await SweetAlert("Error", error.Message, SweetAlertIcon.Error, true, "Ok");
+                    client = new Client();
+                    PhoneList.Clear();
+                    PhoneList.Add(new Phone());
+                    StateHasChanged();
+                }
+
+
+                await SweetAlert("Exito", result.Message, SweetAlertIcon.Success, true, "Ok");
+                client = new Client();
+                PhoneList.Clear();
+                PhoneList.Add(new Phone());
+                StateHasChanged();
+            }*/
+        }
+        else
+        {
+            await SweetAlert("Error", "Verifique el email, es incompleto o incorrecto", SweetAlertIcon.Error, true, "Ok");
+        }
+    }
+
+    private void SeguirTarea(MouseEventArgs e)
+    {
+        if (IdClient != null)
+        {
+            // si cancelo el update, regreso al listado
+            NavManager.NavigateTo("/Client/ListClient");
+        }
+    }
+
+}

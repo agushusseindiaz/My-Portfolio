@@ -1,0 +1,308 @@
+@page "/Permissions"
+@page "/Permissions/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager navigationManager;
+@inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
+
+<style>
+    .my-custom-class {
+        backdrop-filter: blur(10px);
+    }
+    .process-erased {
+        background-color: #fee5e5;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between flex-wrap">
+                <div class="header-title">
+                    <h4 class="card-title mb-0">Roles Y Permisos</h4>
+                </div>
+                <div class="">
+                    @if (Roles.Count >= 5)
+                    {
+                        <MudButton @onclick="MostrarDialog" Variant="Variant.Filled" Color="MudBlazor.Color.Primary">
+                            <i class="btn-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                            </i>
+                            <span>Nuevo Rol</span>
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <a href="#" class=" text-center btn btn-primary btn-icon mt-lg-0 mt-md-0 mt-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+
+                            <i class="btn-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                            </i>
+                            <span>Nuevo Rol</span>
+                        </a>
+                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog mt-8r">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Agregar Nuevo Rol</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form @onsubmit="AddItem">
+                                            <div class="form-group">
+                                                <label for="Name" class="form-label">Nombre del Rol</label>
+                                                <InputText class="form-control" aria-describedby="email" @bind-Value="_role.Name" placeholder="Nombre del Rol" required></InputText>
+                                            </div>
+                                            <div class="text-start mt-2">
+                                                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Guardar</button>
+                                                <button type="cancel" class="btn btn-danger">Cancelar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                @foreach (var rol in Roles)
+                                {
+                                    <th id="rol{@rol.Id}" data-idrol="@rol.Id"  class="text-center">
+                                        @rol.Name
+                                        <div style="float:right;">
+                                            <a class="btn btn-sm btn-icon text-primary flex-end" data-bs-toggle="tooltip" title="Edit User" href="#">
+                                                <span class="btn-inner">
+                                                    <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M11.4925 2.78906H7.75349C4.67849 2.78906 2.75049 4.96606 2.75049 8.04806V16.3621C2.75049 19.4441 4.66949 21.6211 7.75349 21.6211H16.5775C19.6625 21.6211 21.5815 19.4441 21.5815 16.3621V12.3341" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.82812 10.921L16.3011 3.44799C17.2321 2.51799 18.7411 2.51799 19.6721 3.44799L20.8891 4.66499C21.8201 5.59599 21.8201 7.10599 20.8891 8.03599L13.3801 15.545C12.9731 15.952 12.4211 16.181 11.8451 16.181H8.09912L8.19312 12.401C8.20712 11.845 8.43412 11.315 8.82812 10.921Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M15.1655 4.60254L19.7315 9.16854" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    </svg>
+                                                </span>
+                                            </a>
+                                            <a class="btn btn-sm btn-icon text-danger" data-bs-toggle="tooltip" title="Delete User" @onclick="() => DeleteRol(rol.Id)">
+                                                <span class="btn-inner">
+                                                    <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                                                        <path d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M20.708 6.23975H3.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    </svg>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ItemMenus)
+                            {
+                                <tr class="">
+                                    <td class="">
+                                        @item.Name
+                                    </td>
+                                    @foreach (var rol in Roles)
+                                    {
+                                        var checkIs = Permits.Exists(x => x.RolId == rol.Id && x.ItemMenuId == item.Id);
+                                        Console.WriteLine(checkIs + " rol " + rol.Id + " menuid " + item.Id);
+                                        <td class="text-center">
+                                            <input type="checkbox" checked="@checkIs" @onchange="(e) => HandleCheckboxChange(rol.Id,item.Id ,e)" />
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+
+    private bool dataChanged = false;
+    private bool mostrarModal = false;
+
+    IMenuGroupRepository _menuGroupRepository = new MenuGruopRepository();
+    IMenuItemRepository _menuItemRepository = new MenuItemRepository();
+    IRoleRepository _roleRepository = new RoleRepository();
+    IPermitRepository _permitRepository = new PermitRepository();
+
+    List<GroupMenu> GroupMenus = new();
+    List<ItemMenu> ItemMenus = new();
+    List<Role> Roles = new List<Role>();
+    List<Permit> Permits;
+
+    Role _role { get; set; } = new Role();
+    Permit _permit = new Permit();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!NavigableService.Execute(NavigationManager, appState.Permit))
+        {
+            NavigationManager.NavigateTo("/Unauthorized");
+        }
+        else
+        {
+            GroupMenus = await _menuGroupRepository.GetAllMenuGroup();
+            ItemMenus = await _menuItemRepository.GetAllEnableItemMenu();
+            Roles = await _roleRepository.GetAllActiveRoles(appState.IdMortuary);
+            var permisos = await _permitRepository.GetAllPermit(appState.IdUsuario);
+            Permits = await _permitRepository.GetAll(appState.IdUsuario, appState.IdMortuary);
+            Console.WriteLine();
+            Console.WriteLine("Permisos");
+            Console.WriteLine(Permits);
+            foreach (var p in Permits)
+            {
+                Console.WriteLine(p);
+            }
+            Console.WriteLine();
+            /*Console.WriteLine(permisos);
+            foreach(var group in permisos)
+                {
+                Console.WriteLine(group);
+                foreach (var p in group)
+                    {
+                    Console.WriteLine(p);
+            }
+            }*/
+        }
+    }
+
+    private async Task AddItem()
+    {
+        try
+        {
+            _role.MortuaryId = appState.IdMortuary;
+            var role = await _roleRepository.AddRole(_role);
+            if (role.Id > 0)
+            {
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Confirmacion",
+                        Text = "Datos Guardados con Exito",
+                        Icon = SweetAlertIcon.Success,
+                        ShowCancelButton = false,
+                        ConfirmButtonText = "OK"
+                    });
+                var ok = !string.IsNullOrEmpty(resultado.Value);
+                if (ok)
+                {
+                    navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Confirmacion",
+                    Text = "Ocurrio un Error al Guardar",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = false,
+                    ConfirmButtonText = "OK"
+                });
+        }
+    }
+
+    private bool mostrarDialog = false;
+
+    private async Task MostrarDialog()
+    {
+        if (Roles.Count >= 5)
+        {
+            var resultado = Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmacion",
+                Text = "Su Plan no permite mas de 5 Roles, Elimina uno o Cambiate al plan Premium",
+                Icon = SweetAlertIcon.Error,
+                ShowCancelButton = false,
+                ConfirmButtonText = "OK"
+            });
+
+        }
+    }
+
+    async Task DeleteRol(int id)
+    {
+        try
+        {
+            var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmacion",
+                Text = "¿Esta seguro de Borrar el rol?, esta accion no se puede deshacer.",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "SI",
+                CancelButtonText = "Cancelar"
+            });
+            var confirm = !string.IsNullOrEmpty(result.Value);
+            if (confirm)
+            {
+                await JSRuntime.InvokeVoidAsync("processingErased", id);
+                var roldelete = await _roleRepository.DeleteRole(id);
+
+                if (roldelete.Id > 0)
+                {
+                    navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
+                }
+            }
+        }
+        catch
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmacion",
+                Text = "Ocurrio un Error al Guardar",
+                Icon = SweetAlertIcon.Error,
+                ShowCancelButton = false,
+                ConfirmButtonText = "OK"
+            });
+        }
+    }
+
+
+    async void HandleCheckboxChange(int idRol, int itemId, ChangeEventArgs e)
+    {
+        var groupMenu = ItemMenus.FirstOrDefault(x => x.Id == itemId);
+        if (groupMenu != null)
+        {
+            _permit.GroupMenuId = groupMenu.GroupMenuId;
+            _permit.Name = groupMenu.Name;
+        }
+
+        _permit.ItemMenuId = itemId;
+        _permit.RolId = int.Parse(idRol.ToString());
+
+        // Aquí puedes manejar el evento
+        bool isChecked = (bool)e.Value;
+
+        // Realiza cualquier acción que necesites con el estado del checkbox
+        if (isChecked)
+        {
+            _permit.Id = 0;
+            var permit = _permitRepository.AddPermit(_permit);
+            Console.WriteLine($"Checkbox de columna {idRol} con el Id {itemId} {(isChecked ? "marcado" : "desmarcado")}");
+        }
+        else
+        {
+            // El checkbox está desmarcado
+            var permit = _permitRepository.DeletePermit(_permit);
+            Console.WriteLine($"Checkbox de columna {idRol} con el Id {itemId} {(isChecked ? "marcado" : "desmarcado")}");
+        }
+    }
+    
+}

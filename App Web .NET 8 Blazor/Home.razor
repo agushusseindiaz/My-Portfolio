@@ -1,0 +1,218 @@
+﻿@page "/Home"
+@using Color = MudBlazor.Color
+
+@if (appState.Usuario != null)
+{
+    <PageTitle>Home</PageTitle>
+    <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Style="background-color: #F1EDEC">
+                    <MudCardHeader Style="padding-top: 10px; padding-bottom: 0px">
+                        <CardHeaderContent>
+                            <MudText Style="font-size:1.1rem;">Clientes Actuales</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIcon Style=" font-size:3rem;" Icon="@Icons.Material.Filled.PeopleAlt" Color="Color.Primary"/>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent Style="display: flex; align-items: center;">
+                        <MudAvatar Style="height:70px; width:70px; font-size:2rem; margin-left: 50px;" Color="Color.Primary">
+                            @CantidadClientes
+                        </MudAvatar>
+                        <MudText Typo="Typo.h6" Style="margin-left: 10px">Activos</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Href="/Client/ListClient" Variant="Variant.Text" Color="Color.Primary">Ver Mas...</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Style="background-color: #D5D7FB">
+                    <MudCardHeader Style="padding-top: 10px; padding-bottom: 0px">
+                        <CardHeaderContent>
+                            <MudText Style="font-size:1.1rem;">Planes Vigentes</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIcon Style=" font-size:3rem;" Icon="@Icons.Material.Filled.ListAlt" Color="Color.Primary"/>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent Style="display: flex; align-items: center;">
+                        <MudAvatar Style="height:70px; width:70px; font-size:2rem; margin-left: 50px;" Color="Color.Primary">
+                            @CantidadPlanes
+                        </MudAvatar>
+                        <MudText Typo="Typo.h6" Style="margin-left: 10px">Activos</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Href="/planlist" Variant="Variant.Text" Color="Color.Primary">Ver Mas...</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="3">
+                <MudCard Style="background-color: #F1EDEC">
+                    <MudCardHeader Style="padding-top: 10px; padding-bottom: 0px">
+                        <CardHeaderContent>
+                            <MudText Style="font-size:1.1rem;">Contratos Actuales</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIcon Style=" font-size:3rem;" Icon="@Icons.Material.Filled.ContactPage" Color="Color.Primary"/>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent Style="display: flex; align-items: center;">
+                        <MudAvatar Style="height:70px; width:70px; font-size:2rem; margin-left: 50px;" Color="Color.Primary">
+                            @CantidadContratos
+                        </MudAvatar>
+                        <MudText Typo="Typo.h6" Style="margin-left: 10px">Activos</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Href="/ListMembership" Variant="Variant.Text" Color="Color.Primary">Ver Mas...</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="3">
+                <MudCard Style="background-color: #D5D7FB">
+                    <MudCardHeader Style="padding-top: 10px; padding-bottom: 0px">
+                        <CardHeaderContent>
+                            <MudText Style="font-size:1.06rem;">Carrozas Disponibles</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIcon Style=" font-size:3rem;" Icon="@Icons.Material.Filled.AirportShuttle" Color="Color.Primary"/>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent Style="display: flex; align-items: center;">
+                        <MudAvatar Style="height:70px; width:70px; font-size:2rem; margin-left: 50px;" Color="Color.Primary">
+                            @CantidadVehiculos
+                        </MudAvatar>
+                        <MudText Typo="Typo.h6" Style="margin-left: 10px">Activos</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Href="/Inventory" Variant="Variant.Text" Color="Color.Primary">Ver Mas...</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="pa-4" Style="display: flex; align-items: center;height: 200px;background-color: #D5D7FB">
+                            <MudAvatar Style="height:70px; width:70px; font-size:2rem; margin-left: 50px;" Color="Color.Primary">
+                                @NewCliente
+                            </MudAvatar>
+                            <MudText Typo="Typo.h4" Style="margin-left: 10px">Nuevos Clientes de Mes.</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="pa-4" Style="display: flex; align-items: center;height: 200px;background-color: #D5D7FB">
+                            <MudAvatar Style="height:70px; width:70px; font-size:2rem; margin-left: 50px;" Color="Color.Primary">
+                                @PaymenMembership
+                            </MudAvatar>
+                            <MudText Typo="Typo.h4" Style="margin-left: 10px">Contratos Pendientes de Pago.</MudText>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 100%; background-color: #F1EDEC">
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+}
+else
+{
+    <p>Por favor, inicia sesión.</p>
+}
+
+@code
+{
+
+    readonly IClientRepository _clientRepository = new ClientRepository();
+    readonly IPlanRepository _planRepository = new PlanRepository();
+    readonly IMembershipRepository _membershipRepository = new MembershipRepository();
+    readonly IVehicleRepository _vehicleRepository = new VehicleRepository();
+    readonly IReceiptRepository _receiptRepository = new ReceiptRepository();
+    int CantidadClientes { get; set; }
+    int CantidadPlanes { get; set; }
+    int CantidadContratos { get; set; }
+    int CantidadVehiculos { get; set; }
+    int NewCliente { get; set; }
+    int PaymenMembership { get; set; }
+    private int Index = -1;
+    List<int> cantidadContratosPorMes;
+    List<int> cantidadPagosPorMes;
+    List<int> cantidadImpagosPorMes;
+    public List<ChartSeries> Series { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var fechaInicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var fechaFinMes = fechaInicioMes.AddMonths(1).AddTicks(-1);
+            CantidadClientes = await _clientRepository.GetClientCountAsync(appState.IdMortuary);
+            CantidadPlanes = await _planRepository.GetPlanCountAsync(appState.IdMortuary);
+            var memberships = await _membershipRepository.GetAllActiveMemberships(appState.IdMortuary);
+            CantidadContratos = memberships.Count;
+            var vehicles = await _vehicleRepository.GetAllVehicleMortuary(appState.IdMortuary);
+            CantidadVehiculos = vehicles.Count;
+            var clientes = await _clientRepository.GetAllClient(appState.IdMortuary);
+            NewCliente = clientes.Where(m => m.CreatedAt >= fechaInicioMes && m.CreatedAt <= fechaFinMes).Count();
+            var payments = await _receiptRepository.GetAllReceipts(appState.IdMortuary);
+            var contratosActivos = memberships.Where(m => m.StatusId == 1).ToList();
+            var totalPagosEnMesActual = payments.Count(p => p.Date >= fechaInicioMes && p.Date <= fechaFinMes);
+            var pagosAsociadosAContratosActivos = payments.Count(p => contratosActivos.Any(c => c.Id == p.IdMembership));
+            PaymenMembership = contratosActivos.Count - pagosAsociadosAContratosActivos;
+            var notPaid = await _membershipRepository.GetMembershipsWithoutReceipts(appState.IdMortuary);
+
+
+            // Agrupar contratos activos por mes
+            var contratosPorMes = new Dictionary<int, int>();
+            var PagosPorMes = new Dictionary<int, int>();
+            var ImpagosPorMes = new Dictionary<int, int>();
+
+            for (var mes = 1; mes <= 12; mes++)
+            {
+                // Obtener la cantidad de contratos activos para este mes
+                var cantidadContratos = contratosActivos.Count(c => c.CreatedAt.Month == mes);
+                var cantidadPagos = payments.Count(c => c.CreatedAt.Month == mes);
+                var cantidadImpaga = notPaid.Count(c => c.CreatedAt.Month == mes);
+
+                // Almacenar la cantidad de contratos activos para este mes en el diccionario
+                contratosPorMes[mes] = cantidadContratos;
+                PagosPorMes[mes] = cantidadPagos;
+                ImpagosPorMes[mes] = cantidadImpaga;
+            }
+
+            cantidadContratosPorMes = contratosPorMes.Values.ToList();
+            cantidadPagosPorMes = PagosPorMes.Values.ToList();
+            cantidadImpagosPorMes = ImpagosPorMes.Values.ToList();
+            var contratosPorMesArray = cantidadContratosPorMes.Select(x => (double)x).ToArray();
+            var pagosPorMesArray = cantidadPagosPorMes.Select(x => (double)x).ToArray();
+            var impagosPorMesArray = cantidadImpagosPorMes.Select(x => (double)x).ToArray();
+            Series.Add(new ChartSeries { Name = "Planes Activos", Data = contratosPorMesArray.ToArray() });
+            Series.Add(new ChartSeries { Name = "Pagos", Data = pagosPorMesArray.ToArray() });
+            Series.Add(new ChartSeries { Name = "Impagos", Data = impagosPorMesArray.ToArray() });
+        }
+        catch (Exception ex)
+        {
+            // Manejar el error
+        }
+    }
+
+    /*  public List<ChartSeries> Series = new List<ChartSeries>()
+      {
+          new ChartSeries() { Name = "Planes Activos", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15, 60, 70, 50 } },
+          new ChartSeries() { Name = "Pagos", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31, 60, 70, 39 } },
+          new ChartSeries() { Name = "Impagos", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18, 8,20,34 } },
+      };*/
+    public string[] XAxisLabels = { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
+}
